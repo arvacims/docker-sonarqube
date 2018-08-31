@@ -36,5 +36,6 @@ RUN set -x \
 VOLUME /opt/sonarqube/data
 
 WORKDIR /opt/sonarqube
+COPY sonar.properties /opt/sonarqube/conf/
 COPY run.sh /opt/sonarqube/bin/
 ENTRYPOINT ["./bin/run.sh"]
