@@ -1,7 +1,6 @@
 FROM openjdk:8-alpine
 
 ENV SONAR_VERSION=7.3 \
-    SONAR_LDAP_PLUGIN_VERSION=2.2.0.608 \
     SONARQUBE_HOME=/opt/sonarqube \
     # Database configuration
     # Defaults to using H2
@@ -31,14 +30,12 @@ RUN set -x \
     && gpg --batch --verify sonarqube.zip.asc sonarqube.zip \
     && unzip sonarqube.zip \
     && mv sonarqube-$SONAR_VERSION sonarqube \
+    && chown -R sonarqube:sonarqube sonarqube \
     && rm sonarqube.zip* \
     && rm -rf $SONARQUBE_HOME/bin/*
 
 VOLUME "$SONARQUBE_HOME/data"
 
 WORKDIR $SONARQUBE_HOME
-COPY files/sonar-ldap-plugin-"$SONAR_LDAP_PLUGIN_VERSION".jar $SONARQUBE_HOME/extensions/plugins/sonar-ldap-plugin-"$SONAR_LDAP_PLUGIN_VERSION".jar
 COPY run.sh $SONARQUBE_HOME/bin/
-
-RUN chown -R sonarqube:sonarqube $SONARQUBE_HOME
 ENTRYPOINT ["./bin/run.sh"]
