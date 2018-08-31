@@ -1,7 +1,6 @@
 FROM openjdk:8-alpine
 
 ENV SONAR_VERSION=7.3 \
-    SONARQUBE_HOME=/opt/sonarqube \
     # Database configuration
     # Defaults to using H2
     SONARQUBE_JDBC_USERNAME=sonar \
@@ -32,10 +31,10 @@ RUN set -x \
     && mv sonarqube-$SONAR_VERSION sonarqube \
     && chown -R sonarqube:sonarqube sonarqube \
     && rm sonarqube.zip* \
-    && rm -rf $SONARQUBE_HOME/bin/*
+    && rm -rf sonarqube/bin/*
 
-VOLUME "$SONARQUBE_HOME/data"
+VOLUME /opt/sonarqube/data
 
-WORKDIR $SONARQUBE_HOME
-COPY run.sh $SONARQUBE_HOME/bin/
+WORKDIR /opt/sonarqube
+COPY run.sh /opt/sonarqube/bin/
 ENTRYPOINT ["./bin/run.sh"]
