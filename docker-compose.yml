@@ -1,0 +1,57 @@
+version: "2.4"
+
+
+networks:
+
+  web-net:
+    driver: "bridge"
+
+
+volumes:
+
+  sonar-postgres-data:
+    driver: "local"
+
+  sonar-data:
+    driver: "local"
+
+
+services:
+
+  sonar-postgres:
+    image: "postgres:9.6.8-alpine"
+    environment:
+      - "POSTGRES_USER=sonar"
+      - "POSTGRES_PASSWORD=sonar"
+      - "POSTGRES_DB=sonar"
+    networks:
+      - "web-net"
+    volumes:
+      - "sonar-postgres-data:/var/lib/postgresql/data"
+    mem_limit: "256m"
+    restart: "on-failure"
+
+  sonar:
+    build: "./7.3-alpine"
+    image: "arvacims/sonarqube:7.3"
+    environment:
+      - "SONARQUBE_JDBC_USERNAME=sonar"
+      - "SONARQUBE_JDBC_PASSWORD=sonar"
+      - "SONARQUBE_JDBC_URL=jdbc:postgresql://sonar-postgres/sonar"
+    networks:
+      - "web-net"
+    ports:
+      - "9000:9000"
+    volumes:
+      - "sonar-data:/opt/sonarqube/data"
+    mem_limit: "2g"
+    restart: "on-failure"
+    depends_on:
+      - "sonar-postgres"
+
+  adminer:
+    image: "adminer:4.3.1-standalone"
+    networks:
+      - "web-net"
+    ports:
+      - "8080:8080"
